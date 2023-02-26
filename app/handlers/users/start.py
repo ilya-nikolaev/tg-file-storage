@@ -1,20 +1,16 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters import CommandStart
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.filters.bot_admin_filter import BotAdminFilter
-
-
-async def start_process_message(m: types.Message, is_new_user: bool):
-    if is_new_user:
-        await m.answer("Hello!")
-    else:
-        await m.answer("We've already met!")
+from app.keyboards.catalog import get_folder_keyboard
 
 
-async def admin_start_process_message(m: types.Message):
-    await m.answer("Welcome, Administrator!")
+async def start_process_message(m: types.Message, db: AsyncSession):
+    await m.answer(
+        "Добро пожаловать в бота-хранилище!\n"
+        "Тут вы можете создавать папки, хранить файлы и делиться ими с доверенными аккаунтами!",
+        reply_markup=await get_folder_keyboard(db))
 
 
 def register_start(dp: Dispatcher):
-    dp.register_message_handler(admin_start_process_message, CommandStart(), BotAdminFilter())
     dp.register_message_handler(start_process_message, CommandStart())

@@ -11,7 +11,8 @@ from sqlalchemy.orm import sessionmaker
 from app import load_config
 from app.db_api.base import Base
 from app.filters.bot_admin_filter import BotAdminFilter
-from app.handlers.users.start import register_start
+from app.handlers.users import register_catalog
+from app.handlers.users import register_start
 from app.middlewares.db_middleware import DBMiddleware
 from app.middlewares.user_middleware import UserMiddleware
 
@@ -22,12 +23,12 @@ def create_db_factory(db_engine: AsyncEngine):
     return sessionmaker(
         bind=db_engine,
         class_=AsyncSession,
-        expire_on_commit=False
-    )
+        expire_on_commit=False)
 
 
 def setup_handlers(dp: Dispatcher):
     register_start(dp)
+    register_catalog(dp)
 
 
 def setup_middlewares(dp: Dispatcher, db_factory: sessionmaker):
@@ -42,8 +43,7 @@ def setup_filters(dp: Dispatcher):
 async def main():
     logging.basicConfig(
         format=u"%(filename)s:%(lineno)-d #%(levelname)-16s [%(asctime)s] %(message)s",
-        level=logging.INFO
-    )
+        level=logging.INFO)
 
     config = load_config()
 
@@ -52,8 +52,7 @@ async def main():
         f"{config.db_settings.user}:"
         f"{config.db_settings.pswd}@"
         f"{config.db_settings.host}/"
-        f"{config.db_settings.name}"
-    )
+        f"{config.db_settings.name}")
 
     async with db_engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
@@ -67,8 +66,7 @@ async def main():
 
     bot = Bot(
         token=config.bot_settings.token,
-        parse_mode=aiogram.types.ParseMode.HTML
-    )
+        parse_mode=aiogram.types.ParseMode.HTML)
     dp = Dispatcher(bot=bot, storage=storage)
 
     setup_middlewares(dp, db_factory)

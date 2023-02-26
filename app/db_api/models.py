@@ -22,15 +22,18 @@ class Folder(Base):
 
     id = Column(BigInteger, primary_key=True)
 
+    parent_id = Column(ForeignKey("folders.id"))
     name = Column(Text, nullable=False, unique=True)
 
 
 class File(Base):
     __tablename__ = "files"
 
-    file_id = Column(BigInteger, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
 
+    file_id = Column(Text, nullable=False, unique=True)
     name = Column(Text, nullable=False)
-    file_size = Column(BigInteger, nullable=False)
+    size = Column(BigInteger, nullable=False)
 
-    folder = Column(ForeignKey("folders.id"))
+    folder_id = Column(ForeignKey("folders.id"))
+    owner = Column(ForeignKey("users.tg_id"), nullable=False)
